@@ -37,3 +37,15 @@ void UIManager::DrawCrash() {
     // Prompt to restart after crash
     DrawText("Press [R] to Restart", 520, 380, 20, RAYWHITE);
 }
+
+void UIManager::DrawPause() {
+    // Dim the background a bit
+    DrawRectangle(0, 0, 1280, 720, Fade(BLACK, 0.5f));
+
+    // Draw pause text
+    DrawText("PAUSED", 540, 200, 40, YELLOW);
+    DrawText("Press [ESC] to Resume", 480, 300, 20, WHITE);
+    DrawText("Press [R] to Restart", 500, 340, 20, WHITE);
+}
+
+

@@ -43,4 +43,12 @@ public:
      * Typically called when GameState is CRASH. Shows crash message and restart instructions.
      */
     void DrawCrash();
+
+    /**
+     * @brief Draw the pause menu overlay.
+    *
+    * Typically called when the game is paused.
+    */
+    void DrawPause();
+
 };

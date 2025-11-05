@@ -29,5 +29,13 @@ public:
      *
      * Call this every frame during gameplay to keep the rocket centered in view.
      */
-    void Update(Vector2 target);
+    void Update(Vector2 target, float dt);  // pass dt for smoothing
+
+    Vector2 minScroll = { -1000, -1000 }; // left/top world bounds
+    Vector2 maxScroll = { 1000, 1000 };   // right/bottom world bounds
+
+private:
+
+    Vector2 velocity = { 0, 0 }; // for smooth dampening
+    const float smoothTime = 0.1f; // smoothing factor
 };

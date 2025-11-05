@@ -38,6 +38,32 @@ int main() {
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
         audio.Update();
+        
+        if (state == GameState::PLAYING) {
+            // Pause toggle
+            if (IsKeyPressed(KEY_ESCAPE)) {
+                state = GameState::PAUSED;
+            }
+
+            timer += dt;
+            rocket.Update(dt);
+            if (IsKeyDown(KEY_UP)) audio.PlayThrust(IsKeyDown(KEY_UP));
+
+            // Collision logic here...
+            cam.Update(rocket.position);
+        }
+        else if (state == GameState::PAUSED) {
+            // Resume with ESC
+            if (IsKeyPressed(KEY_ESCAPE)) {
+                state = GameState::PLAYING;
+            }
+            // Restart from pause
+            if (IsKeyPressed(KEY_R)) {
+                rocket.Reset({ 0, -200 });
+                state = GameState::PLAYING;
+                timer = 0;
+            }
+        }
 
         // ----------------- STATE LOGIC -----------------
         if (state == GameState::MENU) {
@@ -133,10 +159,13 @@ int main() {
             ui.DrawHUD(rocket.fuel, 300 - rocket.position.y, timer);
         else if (state == GameState::MENU)
             ui.DrawMenu();
+        else if (state == GameState::PAUSED)
+            ui.DrawPause();
         else if (state == GameState::WIN)
             ui.DrawWin();
         else if (state == GameState::CRASH)
             ui.DrawCrash();
+
 
         EndDrawing();
     }
