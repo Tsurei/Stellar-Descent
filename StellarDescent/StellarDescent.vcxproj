@@ -139,9 +139,6 @@
     <ClCompile Include="UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="AudioSystem.h" />
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="GameStateManager.h" />
@@ -156,6 +153,9 @@
     <Media Include="..\..\..\..\Downloads\land.wav" />
     <Media Include="..\..\..\..\Downloads\music.mp3" />
     <Media Include="..\..\..\..\Downloads\thrust.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

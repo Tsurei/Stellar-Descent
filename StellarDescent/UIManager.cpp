@@ -19,7 +19,7 @@ void UIManager::DrawMenu() {
     DrawText("Press [ENTER] to Play", 520, 300, 20, RAYWHITE);
 
     // Draw instruction to exit the game below the start prompt
-    DrawText("Press [ESC] to Exit", 540, 340, 20, GRAY);
+    DrawText("Press [Q] to Exit", 540, 340, 20, GRAY);
 }
 
 void UIManager::DrawWin(float score) {

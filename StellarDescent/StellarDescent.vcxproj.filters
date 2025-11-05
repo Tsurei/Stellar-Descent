@@ -59,9 +59,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Rocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -100,5 +97,8 @@
     <Media Include="..\..\..\..\Downloads\thrust.wav">
       <Filter>Assets\Audio</Filter>
     </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
