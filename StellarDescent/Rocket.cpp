@@ -37,6 +37,8 @@ void Rocket::Update(float dt) {
         if (fuel < 0) fuel = 0; // clamp to zero
     }
 
+    UpdateParticles(dt);
+
     // -------------------- MOVEMENT --------------------
     // Update position based on velocity
     position.x += velocity.x * dt;
@@ -51,7 +53,7 @@ void Rocket::Draw() {
     DrawRectanglePro(body, origin, rotation, RAYWHITE);
 
     // -------------------- THRUST FLAME --------------------
-    // Draw flame triangle if thrusting
+    // Draw flame triangle if thrusting (CURRENTLY NOT WORKING)
     if (IsKeyDown(KEY_UP) && fuel > 0) {
         DrawTriangle(
             { position.x - 5, position.y + 15 }, // bottom-left
@@ -60,6 +62,8 @@ void Rocket::Draw() {
             ORANGE
         );
     }
+
+    DrawParticles(); // draw particles under rocket
 }
 
 void Rocket::Reset(Vector2 startPos) {
@@ -70,4 +74,33 @@ void Rocket::Reset(Vector2 startPos) {
     fuel = 100;
     isAlive = true;
     hasLanded = false;
+}
+
+void Rocket::UpdateParticles(float dt) {
+    // Spawn new particle if thrusting
+    if (IsKeyDown(KEY_UP) && fuel > 0) {
+        Particle p;
+        p.position = { position.x, position.y + 15 }; // under rocket
+        p.velocity = { ((float)rand() / RAND_MAX - 0.5f) * 50, 50 + (float)rand() / RAND_MAX * 50 };
+        p.life = 0.5f + (float)rand() / RAND_MAX * 0.5f;
+        p.color = ORANGE;
+        particles.push_back(p);
+    }
+
+    // Update all particles
+    for (size_t i = 0; i < particles.size(); i++) {
+        particles[i].position.x += particles[i].velocity.x * dt;
+        particles[i].position.y += particles[i].velocity.y * dt;
+        particles[i].life -= dt;
+    }
+
+    // Remove dead particles
+    particles.erase(std::remove_if(particles.begin(), particles.end(),
+        [](Particle& p) { return p.life <= 0; }), particles.end());
+}
+
+void Rocket::DrawParticles() {
+    for (auto& p : particles) {
+        DrawCircle((int)p.position.x, (int)p.position.y, 2, p.color);
+    }
 }

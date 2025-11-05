@@ -1,5 +1,13 @@
 #pragma once
 #include "raylib.h"
+#include <vector>
+
+struct Particle {
+    Vector2 position;
+    Vector2 velocity;
+    float life;       // remaining life in seconds
+    Color color;
+};
 
 /**
  * @brief Represents the player's rocket and handles its physics and rendering.
@@ -26,6 +34,11 @@ public:
 
     /// Flag indicating whether the rocket has successfully landed
     bool hasLanded;
+
+    std::vector<Particle> particles;
+
+    void UpdateParticles(float dt);
+    void DrawParticles();
 
     /**
      * @brief Constructor to initialize the rocket at a starting position.

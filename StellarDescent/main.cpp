@@ -33,6 +33,7 @@ int main() {
 
     GameState state = GameState::MENU;
     float timer = 0.0f;
+    float score = 0;
 
     // -------------------- GAME LOOP --------------------
     while (!WindowShouldClose()) {
@@ -80,6 +81,12 @@ int main() {
                             rocket.hasLanded = true;
                             state = GameState::WIN;
                             audio.PlayLand();
+
+                            float accuracy = 1.0f - (fabs(rocketCenterX - padCenterX) / (planet.landingPad.width / 2.0f)); // 0..1
+                            float timeFactor = 1.0f / (1.0f + timer);  // faster is better
+                            float fuelFactor = rocket.fuel / 100.0f;    // remaining fuel
+
+                            score = (accuracy * 0.5f + timeFactor * 0.3f + fuelFactor * 0.2f) * 1000.0f; // weighted score
                         }
                         else {
                             state = GameState::CRASH;
@@ -160,7 +167,7 @@ int main() {
             ui.DrawPause(); // Implement this in UIManager
             break;
         case GameState::WIN:
-            ui.DrawWin();
+            ui.DrawWin(score);
             break;
         case GameState::CRASH:
             ui.DrawCrash();

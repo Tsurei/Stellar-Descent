@@ -22,12 +22,15 @@ void UIManager::DrawMenu() {
     DrawText("Press [ESC] to Exit", 540, 340, 20, GRAY);
 }
 
-void UIManager::DrawWin() {
+void UIManager::DrawWin(float score) {
     // Draw congratulatory message for successful landing
     DrawText("Landing Successful!", 480, 320, 40, GREEN);
 
     // Prompt to restart the game
     DrawText("Press [R] to Restart", 520, 380, 20, RAYWHITE);
+
+    DrawText(TextFormat("Score: %.0f", score), 500, 420, 30, YELLOW);
+
 }
 
 void UIManager::DrawCrash() {

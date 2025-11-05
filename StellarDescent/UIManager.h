@@ -35,7 +35,7 @@ public:
      *
      * Typically called when GameState is WIN. Shows congratulatory text and restart instructions.
      */
-    void DrawWin();
+    void DrawWin(float score);
 
     /**
      * @brief Draw the crash/fail screen.
