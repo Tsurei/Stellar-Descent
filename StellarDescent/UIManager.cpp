@@ -1,5 +1,10 @@
-#include "UIManager.h"
+﻿#include "UIManager.h"
 
+void UIManager::Init() {
+    //Load Unicode Font
+    Font Unicode = LoadFont("asssets/fonts/ArialUnicodeBold.otf");
+
+}
 void UIManager::DrawHUD(float fuel, float altitude, float timer) {
     // Draw the current fuel level in the top-left corner
     DrawText(TextFormat("Fuel: %.0f", fuel), 20, 20, 20, RAYWHITE);
@@ -19,7 +24,11 @@ void UIManager::DrawMenu() {
     DrawText("Press [ENTER] to Play", 520, 300, 20, RAYWHITE);
 
     // Draw instruction to exit the game below the start prompt
-    DrawText("Press [Q] to Exit", 540, 340, 20, GRAY);
+    DrawText("Press [Q] to Exit", 520, 340, 20, GRAY);
+
+    // Draw instructions on how to play the game
+    DrawText("Press the [Up Arrow] to add thrust!", 460, 390, 20, LIME);
+    DrawText("Press the [Left Arrow] or the [Right Arrow] to rotate the ship", 330, 410, 20, LIME);
 }
 
 void UIManager::DrawWin(float score) {

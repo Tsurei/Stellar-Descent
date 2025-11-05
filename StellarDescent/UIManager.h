@@ -10,6 +10,9 @@
  */
 class UIManager {
 public:
+
+    void Init();
+
     /**
      * @brief Draw the in-game HUD (Heads-Up Display).
      *
