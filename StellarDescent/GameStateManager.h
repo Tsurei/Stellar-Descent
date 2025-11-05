@@ -13,6 +13,7 @@ enum class GameState {
     /// The player is actively controlling the rocket
     PLAYING,
 
+    /// The player has paused the game
     PAUSED,
 
     /// The rocket has landed successfully on the landing pad
