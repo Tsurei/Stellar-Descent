@@ -29,8 +29,9 @@ bool PhysicsSystem::CheckLanding(const Rocket& rocket, Rectangle pad, float maxV
     // -------------------- DEBUG DRAWING --------------------
     // Draw the landing pad in green and rocket collision box in red
     // Useful for visualizing landing collisions
-    DrawRectangleLinesEx(pad, 2, GREEN);
-    DrawRectangleLinesEx(rocketRect, 2, RED);
+    // NOT IMPLEMENTED AS OF NOW
+    DrawRectangleLinesEx(pad, 10, GREEN);
+    DrawRectangleLinesEx(rocketRect, 10, RED);
 
     // Display vertical speed and rotation on screen for debugging
     DrawText(TextFormat("Vert Speed: %.1f  Rot: %.1f", verticalSpeed, rotation), 20, 120, 20, WHITE);
