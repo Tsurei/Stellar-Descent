@@ -50,7 +50,7 @@ void Rocket::Draw() {
     // Draw a rectangle centered on the rocket's position
     Rectangle body = { position.x, position.y, 10, 30 };
     Vector2 origin = { 5, 15 }; // origin at center of rectangle
-    DrawRectanglePro(body, origin, rotation, RAYWHITE);
+    DrawRectanglePro(body, origin, rotation, ORANGE);
 
     // -------------------- THRUST FLAME --------------------
     // Draw flame triangle if thrusting (CURRENTLY NOT WORKING)
