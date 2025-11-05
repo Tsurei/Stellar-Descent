@@ -6,7 +6,6 @@
 #include "PhysicsSystem.h"
 #include "GameStateManager.h"
 #include "Planet.h"
-#include <cmath>
 
 int main() {
     const int SCREEN_WIDTH = 1280;
