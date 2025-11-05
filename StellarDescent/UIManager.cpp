@@ -46,6 +46,7 @@ void UIManager::DrawPause() {
     DrawText("PAUSED", 540, 200, 40, YELLOW);
     DrawText("Press [ESC] to Resume", 480, 300, 20, WHITE);
     DrawText("Press [R] to Restart", 500, 340, 20, WHITE);
+    DrawText("Press [Q] to Quit", 500, 360, 20, WHITE);
 }
 
 
