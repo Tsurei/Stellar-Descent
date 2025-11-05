@@ -39,8 +39,13 @@ bool PhysicsSystem::CheckLanding(const Rocket& rocket, Rectangle pad, float maxV
     // Check if vertical speed is slow enough for safe landing
     bool safeVertical = verticalSpeed <= maxVerticalSpeed;
 
-    // Check if rocket is mostly upright within tolerance
-    bool safeRotation = std::fabs(rotation) <= maxRotationDeg;
+    // Check if rocket is mostly upright within tolerance, 
+    float normalizedRotation = std::fmod(rotation, 360.0f);
+    if (normalizedRotation > 180.0f)
+        normalizedRotation -= 360.0f;
+    else if (normalizedRotation < -180.0f)
+        normalizedRotation += 360.0f;
+    bool safeRotation = std::fabs(normalizedRotation) <= maxRotationDeg;
 
     // Only return true if rocket is over pad AND meets speed & rotation requirements
     return onPad && safeVertical && safeRotation;
