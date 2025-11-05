@@ -34,6 +34,7 @@ int main() {
     GameState state = GameState::MENU;
     float timer = 0.0f;
     float score = 0;
+    bool startGame = false;
 
     // -------------------- GAME LOOP --------------------
     while (!WindowShouldClose()) {
@@ -54,11 +55,12 @@ int main() {
         case GameState::PLAYING:
             // Pause
             if (IsKeyPressed(KEY_ESCAPE)) state = GameState::PAUSED;
-
-            timer += dt;
+            if (IsKeyPressed(KEY_UP)) startGame = true;
+            if (startGame) {
+                timer += dt;
+            }
             rocket.Update(dt);
             if (IsKeyDown(KEY_UP)) audio.PlayThrust(true);
-
             // Collision logic
             {
                 Rectangle groundRect = { -1000, 310, 2000, 400 };
@@ -124,6 +126,7 @@ int main() {
                 rocket.Reset({ 0, -200 });
                 state = GameState::PLAYING;
                 timer = 0;
+                startGame = false;
             }
             if (IsKeyPressed(KEY_Q)) break;
             break;
