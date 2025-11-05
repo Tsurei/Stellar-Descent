@@ -82,7 +82,7 @@ int main() {
                             state = GameState::WIN;
                             audio.PlayLand();
 
-                            float accuracy = 1.0f - (fabs(rocketCenterX - padCenterX) / (planet.landingPad.width / 2.0f)); // 0..1
+                            float accuracy = 1.0f - (fabs(rocketCenterX - padCenterX) / (planet.landingPad.width / 2.0f)); // 0.1
                             float timeFactor = 1.0f / (1.0f + timer);  // faster is better
                             float fuelFactor = rocket.fuel / 100.0f;    // remaining fuel
 
@@ -158,7 +158,6 @@ int main() {
         switch (state) {
         case GameState::MENU:
             ui.DrawMenu();
-            DrawText("Press [Q] to Quit", 500, 380, 20, WHITE);
             break;
         case GameState::PLAYING:
             ui.DrawHUD(rocket.fuel, 300 - rocket.position.y, timer);
