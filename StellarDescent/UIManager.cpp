@@ -1,8 +1,31 @@
 ﻿#include "UIManager.h"
 
 void UIManager::Init() {
-    //Load Unicode Font
-    Font Unicode = LoadFont("asssets/fonts/ArialUnicodeBold.otf");
+    // -------------------- LOAD FONT --------------------
+    // We want ASCII (32–126) + arrows: ← ↑ → ↓ (U+2190–U+2193)
+    int asciiCount = 95;               // ASCII 32–126
+    int arrowsCount = 4;               // ← ↑ → ↓
+    int totalCodepoints = asciiCount + arrowsCount;
+
+    // Allocate codepoint array
+    int* codepoints = (int*)malloc(sizeof(int) * totalCodepoints);
+
+    // Fill ASCII
+    for (int i = 0; i < asciiCount; i++) {
+        codepoints[i] = 32 + i;
+    }
+
+    // Add arrow codepoints
+    codepoints[asciiCount + 0] = 0x2190; // ←
+    codepoints[asciiCount + 1] = 0x2191; // ↑
+    codepoints[asciiCount + 2] = 0x2192; // →
+    codepoints[asciiCount + 3] = 0x2193; // ↓
+
+
+    unicode = LoadFontEx("assets/fonts/NotoSansSymbols-ExtraBold.ttf", 256, codepoints, totalCodepoints);
+    title = LoadFontEx("assets/fonts/Monlight.otf", 64, 0, 0);
+    // Free temporary array
+    free(codepoints);
 
 }
 void UIManager::DrawHUD(float fuel, float altitude, float timer) {
@@ -18,17 +41,49 @@ void UIManager::DrawHUD(float fuel, float altitude, float timer) {
 
 void UIManager::DrawMenu() {
     // Draw the game title centered near the top
-    DrawText("STELLAR DESCENT", 440, 200, 40, RAYWHITE);
+    //DrawText("STELLAR DESCENT", 440, 200, 40, RAYWHITE);
+    DrawTextEx(
+        title,
+        "Stellar",
+        { 480, 130 },
+        126,
+        2,
+        SKYBLUE
+    );
+    DrawTextEx(
+        title,
+        "Descent",
+        { 550, 200 },
+        126,
+        2,
+        BLUE
+    );
 
     // Draw instruction to start the game below the title
-    DrawText("Press [ENTER] to Play", 520, 300, 20, RAYWHITE);
+    DrawText("Press [ENTER] to Play", 520, 300, 40, RAYWHITE);
 
     // Draw instruction to exit the game below the start prompt
-    DrawText("Press [Q] to Exit", 520, 340, 20, GRAY);
+    DrawText("Press [Q] to Exit", 520, 340, 40, RAYWHITE);
 
-    // Draw instructions on how to play the game
-    DrawText("Press the [Up Arrow] to add thrust!", 460, 390, 20, LIME);
-    DrawText("Press the [Left Arrow] or the [Right Arrow] to rotate the ship", 330, 410, 20, LIME);
+    // Draw instructions on how to play the game using the Unicode font
+    DrawTextEx(
+        unicode,
+        u8"Press ↑ to add thrust!",
+        { 450, 390 },   // position
+        60,           // font size
+        2,            // spacing between characters
+        DARKBLUE
+    );
+
+    DrawTextEx(
+        unicode,
+        u8"Press ← or → to rotate the ship",
+        { 385, 420 },   // position
+        60,           // font size
+        2,            // spacing between characters
+        DARKBLUE
+    );
+    //DrawTextEx("Press [Left Arrow] or the [Right Arrow] to rotate the ship", 330, 410, 20, LIME);
 }
 
 void UIManager::DrawWin(float score) {
@@ -59,6 +114,10 @@ void UIManager::DrawPause() {
     DrawText("Press [ESC] to Resume", 480, 300, 20, WHITE);
     DrawText("Press [R] to Restart", 500, 340, 20, WHITE);
     DrawText("Press [Q] to Quit", 500, 360, 20, WHITE);
+}
+
+void UIManager::Close() {
+    UnloadFont(unicode);
 }
 
 

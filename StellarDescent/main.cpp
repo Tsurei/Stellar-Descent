@@ -23,6 +23,7 @@ int main() {
     CameraController cam;
     PhysicsSystem physics;
 
+    ui.Init();
     audio.Init();
     cam.Init(rocket.position);
     cam.camera.offset = { SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f };
@@ -181,6 +182,7 @@ int main() {
     // -------------------- CLEANUP --------------------
     UnloadTexture(starfield);
     audio.Close();
+    ui.Close();
     CloseWindow();
     return 0;
 }

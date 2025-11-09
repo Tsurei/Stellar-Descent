@@ -11,6 +11,10 @@
 class UIManager {
 public:
 
+    //Font Stream
+    Font unicode;
+    Font title;
+
     void Init();
 
     /**
@@ -53,5 +57,13 @@ public:
     * Typically called when the game is paused.
     */
     void DrawPause();
+
+    /**
+ * @brief Close the ui system and free resources.
+ *
+ * Stops UI, unloads UI and font assets, and closes the UI device.
+ * Should be called once when the game exits.
+ */
+    void Close();
 
 };
