@@ -7,6 +7,7 @@
 #include "GameStateManager.h"
 #include "Planet.h"
 #include "MovingObstacle.h"
+
 #include <vector>
 #include <cmath>
 
@@ -130,12 +131,9 @@ int main() {
             audio.ToggleMute();
         }
 
-        // Increase volume
         if (IsKeyPressed(KEY_EQUAL) || IsKeyPressed(KEY_KP_ADD)) {
             audio.SetVolume(audio.GetVolume() + 0.1f);
         }
-
-        // Decrease volume
         if (IsKeyPressed(KEY_MINUS) || IsKeyPressed(KEY_KP_SUBTRACT)) {
             audio.SetVolume(audio.GetVolume() - 0.1f);
         }
@@ -147,9 +145,9 @@ int main() {
             bool difficultyChanged = false;
 
             // Change difficulty with number keys
-            if (IsKeyPressed(KEY_ONE)) { currentDifficultyIndex = 0; difficultyChanged = true; } // Easy
-            if (IsKeyPressed(KEY_TWO)) { currentDifficultyIndex = 1; difficultyChanged = true; } // Normal
-            if (IsKeyPressed(KEY_THREE)) { currentDifficultyIndex = 2; difficultyChanged = true; } // Hard
+            if (IsKeyPressed(KEY_ONE)) { currentDifficultyIndex = 0; difficultyChanged = true; }
+            if (IsKeyPressed(KEY_TWO)) { currentDifficultyIndex = 1; difficultyChanged = true; }
+            if (IsKeyPressed(KEY_THREE)) { currentDifficultyIndex = 2; difficultyChanged = true; }
 
             if (difficultyChanged) {
                 DifficultyPreset& d = difficulties[currentDifficultyIndex];
@@ -178,7 +176,6 @@ int main() {
 
         case GameState::PLAYING:
         {
-            // Pause
             if (IsKeyPressed(KEY_ESCAPE)) state = GameState::PAUSED;
             if (IsKeyPressed(KEY_UP)) startGame = true;
             if (startGame) {
@@ -198,20 +195,18 @@ int main() {
             // -------------------- COLLISION LOGIC --------------------
             {
                 Rectangle groundRect = { -1000, 310, 2000, 400 };
-                Rectangle rocketRect = { rocket.position.x - 5, rocket.position.y - 12, 10, 24 };
+                Rectangle rocketRect = { rocket.position.x - 5, rocket.position.y - 15, 10, 30 };
 
                 bool onPad = CheckCollisionRecs(rocketRect, planet.landingPad);
                 bool hitsGround = CheckCollisionRecs(rocketRect, groundRect);
 
                 // -------------------- VIEW RECTANGLE --------------------
-                // Compute the visible world area from the camera, expanded slightly
                 Rectangle viewRect;
                 viewRect.width = SCREEN_WIDTH / cam.camera.zoom;
                 viewRect.height = SCREEN_HEIGHT / cam.camera.zoom;
                 viewRect.x = cam.camera.target.x - viewRect.width / 2.0f;
                 viewRect.y = cam.camera.target.y - viewRect.height / 2.0f;
 
-                // Expand a bit so collisions just off the edge still count as "near"
                 const float margin = 40.0f;
                 viewRect.x -= margin;
                 viewRect.y -= margin;
@@ -220,11 +215,15 @@ int main() {
 
                 // -------------------- OBSTACLE COLLISION --------------------
                 bool hitsObstacle = false;
+
+                // Rocket as an oriented box (10x30, centered at rocket.position)
+                Vector2 rocketCenter = rocket.position;
+                Vector2 rocketHalfExtents = { 5.0f, 15.0f };
+
                 for (const auto& o : obstacles) {
-                    // Skip obstacles that are far off-screen
                     if (!o.IsNear(viewRect)) continue;
 
-                    if (o.CheckCollision(rocketRect)) {
+                    if (o.CheckCollisionOBB(rocketCenter, rocketHalfExtents, rocket.rotation)) {
                         hitsObstacle = true;
                         break;
                     }
@@ -241,20 +240,22 @@ int main() {
                         float rocketCenterX = rocket.position.x;
                         float horizontalTolerance = planet.landingPad.width / 2.0f - 5;
 
-                        bool withinPadHoriz = fabs(rocketCenterX - padCenterX) <= horizontalTolerance;
+                        bool withinPadHoriz = std::fabs(rocketCenterX - padCenterX) <= horizontalTolerance;
                         float maxVerticalSpeed = 50.0f;
                         float maxRotationDeg = 30.0f;
 
-                        if (withinPadHoriz && physics.CheckLanding(rocket, planet.landingPad, maxVerticalSpeed, maxRotationDeg)) {
+                        if (withinPadHoriz &&
+                            physics.CheckLanding(rocket, planet.landingPad, maxVerticalSpeed, maxRotationDeg)) {
+
                             rocket.hasLanded = true;
                             state = GameState::WIN;
                             audio.PlayLand();
 
-                            float accuracy = 1.0f - (fabs(rocketCenterX - padCenterX) / (planet.landingPad.width / 2.0f));
-                            float timeFactor = 1.0f / (1.0f + timer);  // faster is better
-                            float fuelFactor = rocket.fuel / 100.0f;    // TODO: use rocket.GetFuelFraction() if you added it
+                            float accuracy = 1.0f - (std::fabs(rocketCenterX - padCenterX) / (planet.landingPad.width / 2.0f));
+                            float timeFactor = 1.0f / (1.0f + timer);
+                            float fuelFactor = rocket.fuel / 100.0f;
 
-                            score = (accuracy * 0.5f + timeFactor * 0.3f + fuelFactor * 0.2f) * 1000.0f; // weighted score
+                            score = (accuracy * 0.5f + timeFactor * 0.3f + fuelFactor * 0.2f) * 1000.0f;
                         }
                         else {
                             state = GameState::CRASH;
@@ -265,7 +266,7 @@ int main() {
                         state = GameState::CRASH;
                         audio.PlayCrash();
                     }
-                    rocket.position.y = 310 - 12;
+                    rocket.position.y = 310 - 15;
                     rocket.velocity = { 0, 0 };
                 }
             }
@@ -273,15 +274,12 @@ int main() {
         }
 
         case GameState::PAUSED:
-            // Resume
             if (IsKeyPressed(KEY_ESCAPE)) state = GameState::PLAYING;
-            // Restart
             if (IsKeyPressed(KEY_R)) {
                 rocket.Reset({ 0, -200 });
                 state = GameState::PLAYING;
                 timer = 0;
             }
-            // Quit
             if (IsKeyPressed(KEY_Q)) CloseWindow();
             break;
 
@@ -319,7 +317,7 @@ int main() {
         DrawRectangle(-1000, 310, 2000, 400, DARKGRAY);
         DrawRectangleRec(planet.landingPad, GREEN);
 
-        // -------------------- DRAW OBSTACLES --------------------
+        // Draw obstacles
         for (const auto& o : obstacles) {
             o.Draw();
         }
