@@ -6,20 +6,69 @@
 #include "PhysicsSystem.h"
 #include "GameStateManager.h"
 #include "Planet.h"
+#include "MovingObstacle.h"
+#include <vector>
+#include <cmath>
 
 /**
  * @brief Represents a difficulty preset for Stellar Descent.
  *
- * Each preset controls gravity strength, starting fuel, and landing pad size.
+ * Each preset controls gravity strength, starting fuel, obstacle density and landing pad size.
  * These values are applied to both the rocket and planet/world.
  */
 struct DifficultyPreset {
-    const char* name;     // Display name ("Easy", "Normal", "Hard")
-    float gravity;        // Downward acceleration applied to the rocket
-    float startingFuel;   // Initial fuel given to the player
-    float padWidth;       // Width of the landing pad in world units
+    const char* name;
+    float gravity;
+    float startingFuel;
+    float padWidth;
+    int   obstacleCount;
 };
 
+/// Generate a set of moving obstacles for a given difficulty.
+static void SetupObstaclesForDifficulty(const DifficultyPreset& diff,
+    std::vector<MovingObstacle>& obstacles)
+{
+    obstacles.clear();
+
+    // Base area around landing zone
+    float minX = -220.0f;
+    float maxX = 220.0f;
+    float minY = -200.0f;
+    float maxY = 260.0f; // above ground (y=310)
+
+    for (int i = 0; i < diff.obstacleCount; ++i) {
+        // Random size
+        float w = (float)GetRandomValue(40, 80);
+        float h = (float)GetRandomValue(8, 18);
+
+        // Random position in the play area
+        float x = (float)GetRandomValue((int)minX, (int)maxX);
+        float y = (float)GetRandomValue((int)minY, (int)maxY);
+
+        Rectangle r{ x, y, w, h };
+
+        // Random pattern
+        int patternRoll = GetRandomValue(0, 2);
+        ObstaclePattern pattern =
+            (patternRoll == 0) ? ObstaclePattern::STATIC :
+            (patternRoll == 1) ? ObstaclePattern::HORIZONTAL :
+            ObstaclePattern::VERTICAL;
+
+        // Random movement params
+        float amplitude = (pattern == ObstaclePattern::STATIC)
+            ? 0.0f
+            : (float)GetRandomValue(20, 80);
+
+        float frequency = (pattern == ObstaclePattern::STATIC)
+            ? 0.0f
+            : (float)GetRandomValue(1, 3) / 2.0f; // 0.5–1.5
+
+        float phase = (float)GetRandomValue(0, 628) / 100.0f; // 0–6.28
+        float angVel = (float)GetRandomValue(-90, 90);        // -90..90 deg/sec
+
+        obstacles.emplace_back(r, pattern, amplitude, frequency, phase, angVel);
+    }
+}
 
 int main() {
     const int SCREEN_WIDTH = 1280;
@@ -32,28 +81,22 @@ int main() {
 
     // -------------------- DIFFICULTY PRESETS --------------------
     DifficultyPreset difficulties[] = {
-        { "Easy",   60.0f, 150.0f, 140.0f },
-        { "Normal", 80.0f, 100.0f, 100.0f },
-        { "Hard",   100.0f, 70.0f, 70.0f }
+        { "Easy",   60.0f, 150.0f, 140.0f, 2 },
+        { "Normal", 80.0f, 100.0f, 100.0f, 4 },
+        { "Hard",  100.0f,  70.0f,  70.0f, 6 },
     };
     int currentDifficultyIndex = 1; // Start at Normal
 
     Rocket rocket({ 0, -200 });
 
-    // Initialize planet using the active difficulty preset
-    DifficultyPreset& initialDiff = difficulties[currentDifficultyIndex];
+    DifficultyPreset& diff = difficulties[currentDifficultyIndex];
     Planet planet = {
-        initialDiff.gravity,
-        Rectangle{
-            -initialDiff.padWidth / 2.0f,  // keep pad centered at x = 0
-            310,
-            initialDiff.padWidth,
-            10
-        }
+        diff.gravity,
+        Rectangle{ -diff.padWidth / 2.0f, 310, diff.padWidth, 10 }
     };
 
     // Apply initial difficulty to rocket physics and fuel
-    rocket.SetDifficultyParams(initialDiff.gravity, initialDiff.startingFuel);
+    rocket.SetDifficultyParams(diff.gravity, diff.startingFuel);
 
     UIManager ui;
     AudioSystem audio;
@@ -73,10 +116,15 @@ int main() {
     float score = 0;
     bool startGame = false;
 
+    // -------------------- MOVING OBSTACLES --------------------
+    std::vector<MovingObstacle> obstacles;
+    SetupObstaclesForDifficulty(diff, obstacles);
+
     // -------------------- GAME LOOP --------------------
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
         audio.Update();
+
         // ----------------- AUDIO CONTROLS -----------------
         if (IsKeyPressed(KEY_M)) {
             audio.ToggleMute();
@@ -95,24 +143,59 @@ int main() {
         // ----------------- STATE LOGIC -----------------
         switch (state) {
         case GameState::MENU:
+        {
+            bool difficultyChanged = false;
+
+            // Change difficulty with number keys
+            if (IsKeyPressed(KEY_ONE)) { currentDifficultyIndex = 0; difficultyChanged = true; } // Easy
+            if (IsKeyPressed(KEY_TWO)) { currentDifficultyIndex = 1; difficultyChanged = true; } // Normal
+            if (IsKeyPressed(KEY_THREE)) { currentDifficultyIndex = 2; difficultyChanged = true; } // Hard
+
+            if (difficultyChanged) {
+                DifficultyPreset& d = difficulties[currentDifficultyIndex];
+
+                // Apply difficulty to planet
+                planet.gravity = d.gravity;
+                planet.landingPad.width = d.padWidth;
+                planet.landingPad.x = -d.padWidth / 2.0f; // keep centered
+
+                // Apply to rocket (gravity/fuel)
+                rocket.SetDifficultyParams(d.gravity, d.startingFuel);
+
+                // Regenerate obstacles for this difficulty
+                SetupObstaclesForDifficulty(d, obstacles);
+            }
+
             if (IsKeyPressed(KEY_ENTER)) {
                 rocket.Reset({ 0, -200 });
                 state = GameState::PLAYING;
                 timer = 0;
+                startGame = false;
             }
             if (IsKeyPressed(KEY_Q)) CloseWindow(); // Quit from menu
             break;
+        }
 
         case GameState::PLAYING:
+        {
             // Pause
             if (IsKeyPressed(KEY_ESCAPE)) state = GameState::PAUSED;
             if (IsKeyPressed(KEY_UP)) startGame = true;
             if (startGame) {
                 timer += dt;
             }
+
             rocket.Update(dt);
+            cam.Update(rocket.position, dt);
+
             if (IsKeyDown(KEY_UP)) audio.PlayThrust(true);
-            // Collision logic
+
+            // -------------------- UPDATE OBSTACLES --------------------
+            for (auto& o : obstacles) {
+                o.Update(dt);
+            }
+
+            // -------------------- COLLISION LOGIC --------------------
             {
                 Rectangle groundRect = { -1000, 310, 2000, 400 };
                 Rectangle rocketRect = { rocket.position.x - 5, rocket.position.y - 12, 10, 24 };
@@ -120,7 +203,39 @@ int main() {
                 bool onPad = CheckCollisionRecs(rocketRect, planet.landingPad);
                 bool hitsGround = CheckCollisionRecs(rocketRect, groundRect);
 
-                if (hitsGround) {
+                // -------------------- VIEW RECTANGLE --------------------
+                // Compute the visible world area from the camera, expanded slightly
+                Rectangle viewRect;
+                viewRect.width = SCREEN_WIDTH / cam.camera.zoom;
+                viewRect.height = SCREEN_HEIGHT / cam.camera.zoom;
+                viewRect.x = cam.camera.target.x - viewRect.width / 2.0f;
+                viewRect.y = cam.camera.target.y - viewRect.height / 2.0f;
+
+                // Expand a bit so collisions just off the edge still count as "near"
+                const float margin = 40.0f;
+                viewRect.x -= margin;
+                viewRect.y -= margin;
+                viewRect.width += margin * 2.0f;
+                viewRect.height += margin * 2.0f;
+
+                // -------------------- OBSTACLE COLLISION --------------------
+                bool hitsObstacle = false;
+                for (const auto& o : obstacles) {
+                    // Skip obstacles that are far off-screen
+                    if (!o.IsNear(viewRect)) continue;
+
+                    if (o.CheckCollision(rocketRect)) {
+                        hitsObstacle = true;
+                        break;
+                    }
+                }
+
+                if (hitsObstacle) {
+                    state = GameState::CRASH;
+                    audio.PlayCrash();
+                    rocket.velocity = { 0, 0 };
+                }
+                else if (hitsGround) {
                     if (onPad) {
                         float padCenterX = planet.landingPad.x + planet.landingPad.width / 2.0f;
                         float rocketCenterX = rocket.position.x;
@@ -135,9 +250,9 @@ int main() {
                             state = GameState::WIN;
                             audio.PlayLand();
 
-                            float accuracy = 1.0f - (fabs(rocketCenterX - padCenterX) / (planet.landingPad.width / 2.0f)); // 0.1
+                            float accuracy = 1.0f - (fabs(rocketCenterX - padCenterX) / (planet.landingPad.width / 2.0f));
                             float timeFactor = 1.0f / (1.0f + timer);  // faster is better
-                            float fuelFactor = rocket.fuel / 100.0f;    // remaining fuel
+                            float fuelFactor = rocket.fuel / 100.0f;    // TODO: use rocket.GetFuelFraction() if you added it
 
                             score = (accuracy * 0.5f + timeFactor * 0.3f + fuelFactor * 0.2f) * 1000.0f; // weighted score
                         }
@@ -154,9 +269,8 @@ int main() {
                     rocket.velocity = { 0, 0 };
                 }
             }
-
-            cam.Update(rocket.position, dt);
             break;
+        }
 
         case GameState::PAUSED:
             // Resume
@@ -204,6 +318,12 @@ int main() {
 
         DrawRectangle(-1000, 310, 2000, 400, DARKGRAY);
         DrawRectangleRec(planet.landingPad, GREEN);
+
+        // -------------------- DRAW OBSTACLES --------------------
+        for (const auto& o : obstacles) {
+            o.Draw();
+        }
+
         rocket.Draw();
 
         EndMode2D();
@@ -211,13 +331,13 @@ int main() {
         // Draw UI
         switch (state) {
         case GameState::MENU:
-            ui.DrawMenu();
+            ui.DrawMenu(difficulties[currentDifficultyIndex].name);
             break;
         case GameState::PLAYING:
             ui.DrawHUD(rocket.fuel, 300 - rocket.position.y, timer);
             break;
         case GameState::PAUSED:
-            ui.DrawPause(); // Implement this in UIManager
+            ui.DrawPause();
             break;
         case GameState::WIN:
             ui.DrawWin(score);
@@ -235,6 +355,7 @@ int main() {
                 volPercent),
             20, SCREEN_HEIGHT - 40, 20, RAYWHITE
         );
+
         EndDrawing();
     }
 

@@ -132,6 +132,7 @@
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MovingObstacle.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="Planetcpp.cpp" />
     <ClCompile Include="PlanetManager.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="AudioSystem.h" />
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="GameStateManager.h" />
+    <ClInclude Include="MovingObstacle.h" />
     <ClInclude Include="PhysicsSystem.h" />
     <ClInclude Include="Planet.h" />
     <ClInclude Include="PlanetManager.h" />

@@ -40,57 +40,130 @@ void UIManager::DrawHUD(float fuel, float altitude, float timer) {
 }
 
 void UIManager::DrawMenu(const std::string& difficultyLabel) {
-    // Draw the game title centered near the top
-    //DrawText("STELLAR DESCENT", 440, 200, 40, RAYWHITE);
+    int screenWidth = GetScreenWidth();
+    int screenHeight = GetScreenHeight();
+
+    // -------------------- TITLE  --------------------
+
+    const float stellarSize = 156.0f;
+    const float descentSize = 100.0f;      
+    const float spacing = 2.0f;
+
+    // Measure text sizes
+    Vector2 stellarMeasure = MeasureTextEx(title, "Stellar", stellarSize, spacing);
+    Vector2 descentMeasure = MeasureTextEx(title, "Descent", descentSize, spacing);
+
+    float stellarX = screenWidth / 2.0f - stellarMeasure.x / 2.0f;
+    float stellarY = 120.0f;
+
+    float descentX = stellarX + stellarMeasure.x * 0.18f;
+    float descentY = stellarY + stellarMeasure.y - 70.0f;
+
+    // Draw Stellar (main)
     DrawTextEx(
         title,
         "Stellar",
-        { 480, 130 },
-        126,
-        2,
+        { stellarX, stellarY },
+        stellarSize,
+        spacing,
         SKYBLUE
     );
+
+    // Draw Descent (subtitle)
     DrawTextEx(
         title,
         "Descent",
-        { 550, 200 },
-        126,
-        2,
+        { descentX, descentY },
+        descentSize,
+        spacing,
         BLUE
     );
 
-    // Draw instruction to start the game below the title
-    DrawText("Press [ENTER] to Play", 520, 300, 40, RAYWHITE);
 
-    // Draw instruction to exit the game below the start prompt
-    DrawText("Press [Q] to Exit", 520, 340, 40, RAYWHITE);
+    // -------------------- MENU PROMPTS --------------------
+    // Center "Press [ENTER] to Play" and "Press [Q] to Exit" horizontally.
+    const int menuFontSize = 40;
 
-    // Draw instructions on how to play the game using the Unicode font
-    DrawTextEx(
-        unicode,
-        u8"Press ↑ to add thrust!",
-        { 450, 390 },   // position
-        60,             // font size
-        2,              // spacing between characters
-        DARKBLUE
-    );
-
-    DrawTextEx(
-        unicode,
-        u8"Press ← or → to rotate the ship",
-        { 385, 420 },   // position
-        60,             // font size
-        2,              // spacing between characters
-        DARKBLUE
-    );
-
-    // -------------------- DIFFICULTY INFO --------------------
-    // Show current difficulty and how to change it along the bottom.
+    const char* playText = "Press [ENTER] to Play";
+    int playWidth = MeasureText(playText, menuFontSize);
     DrawText(
-        TextFormat("Difficulty: %s  [1]=Easy  [2]=Normal  [3]=Hard", difficultyLabel.c_str()),
-        20,
-        680,
-        20,
+        playText,
+        screenWidth / 2 - playWidth / 2,
+        300,
+        menuFontSize,
+        RAYWHITE
+    );
+
+    const char* quitText = "Press [Q] to Exit";
+    int quitWidth = MeasureText(quitText, menuFontSize);
+    DrawText(
+        quitText,
+        screenWidth / 2 - quitWidth / 2,
+        340,
+        menuFontSize,
+        RAYWHITE
+    );
+
+    // -------------------- CONTROL INSTRUCTIONS --------------------
+    // Center the Unicode control hints using the Unicode font.
+    const float controlsFontSize = 60.0f;
+    const float controlsSpacing = 2.0f;
+
+    const char* thrustText = u8"Press ↑ to add thrust!";
+    Vector2 thrustSize = MeasureTextEx(
+        unicode,
+        thrustText,
+        controlsFontSize,
+        controlsSpacing
+    );
+    Vector2 thrustPos = {
+        screenWidth / 2.0f - thrustSize.x / 2.0f,
+        390.0f
+    };
+    DrawTextEx(
+        unicode,
+        thrustText,
+        thrustPos,
+        controlsFontSize,
+        controlsSpacing,
+        BLUE
+    );
+
+    const char* rotateText = u8"Press ← or → to rotate the ship";
+    Vector2 rotateSize = MeasureTextEx(
+        unicode,
+        rotateText,
+        controlsFontSize,
+        controlsSpacing
+    );
+    Vector2 rotatePos = {
+        screenWidth / 2.0f - rotateSize.x / 2.0f,
+        thrustPos.y + thrustSize.y - 20.0f
+    };
+    DrawTextEx(
+        unicode,
+        rotateText,
+        rotatePos,
+        controlsFontSize,
+        controlsSpacing,
+        BLUE
+    );
+
+    // -------------------- DIFFICULTY INFO (BOTTOM-RIGHT) --------------------
+    // Draw current difficulty and hotkeys anchored to bottom-right corner.
+    const int diffFontSize = 20;
+    const char* diffText = TextFormat(
+        "Difficulty: %s  [1]=Easy  [2]=Normal  [3]=Hard",
+        difficultyLabel.c_str()
+    );
+
+    int diffWidth = MeasureText(diffText, diffFontSize);
+
+    DrawText(
+        diffText,
+        screenWidth - diffWidth - 20,
+        screenHeight - diffFontSize - 20,
+        diffFontSize,
         RAYWHITE
     );
 }
