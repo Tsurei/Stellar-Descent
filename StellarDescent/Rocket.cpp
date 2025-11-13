@@ -7,15 +7,21 @@ Rocket::Rocket(Vector2 startPos) {
     position = startPos;       // Starting position in world coordinates
     velocity = { 0, 0 };       // No initial movement
     rotation = 0;              // Upright orientation
-    fuel = 100;                // Full fuel
+
+    // Base difficulty defaults (can be overridden by difficulty presets)
+    maxFuel = 100.0f;          // Default max fuel
+    gravity = 80.0f;           // Default gravity strength
+
+    fuel = maxFuel;            // Start with full fuel
     isAlive = true;            // Rocket is active
     hasLanded = false;         // Not yet landed
 }
 
+
 void Rocket::Update(float dt) {
     // -------------------- GRAVITY --------------------
     // Simple downward acceleration (pixels/sec^2)
-    velocity.y += 80.0f * dt;
+    velocity.y += gravity * dt;
 
     // -------------------- ROTATION --------------------
     // Rotate left/right based on key input (degrees/sec)
@@ -71,7 +77,7 @@ void Rocket::Reset(Vector2 startPos) {
     position = startPos;
     velocity = { 0, 0 };
     rotation = 0;
-    fuel = 100;
+    fuel = maxFuel;       // refill according to current difficulty
     isAlive = true;
     hasLanded = false;
 }
@@ -98,6 +104,20 @@ void Rocket::UpdateParticles(float dt) {
     particles.erase(std::remove_if(particles.begin(), particles.end(),
         [](Particle& p) { return p.life <= 0; }), particles.end());
 }
+
+void Rocket::SetDifficultyParams(float gravityStrength, float startingFuel) {
+    // -------------------- DIFFICULTY PRESET --------------------
+    // Store the new gravity and fuel settings so that all future
+    // updates and resets use these values.
+    gravity = gravityStrength;
+    maxFuel = startingFuel;
+
+    // Ensure current fuel never exceeds the new capacity
+    if (fuel > maxFuel) {
+        fuel = maxFuel;
+    }
+}
+
 
 void Rocket::DrawParticles() {
     for (auto& p : particles) {

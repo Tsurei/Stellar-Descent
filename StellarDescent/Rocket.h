@@ -29,6 +29,12 @@ public:
     /// Remaining fuel for thrust
     float fuel;
 
+    /// Maximum fuel capacity for the rocket (used when resetting/difficulty changes)
+    float maxFuel = 100.0f;
+
+    /// Gravity strength currently affecting the rocket (pixels/sec^2)
+    float gravity = 80.0f;
+
     /// Flag indicating whether the rocket is still active/alive
     bool isAlive;
 
@@ -77,6 +83,26 @@ public:
      * Resets velocity, rotation, fuel, and status flags.
      */
     void Reset(Vector2 startPos);
+
+    /**
+     * @brief Get remaining fuel as a normalized fraction.
+     *
+     * @return Value between 0.0f (empty) and 1.0f (full).
+     *         Uses maxFuel as the reference capacity.
+     */
+    float GetFuelFraction() const { return maxFuel > 0 ? fuel / maxFuel : 0.0f; }
+
+    /**
+     * @brief Configure the rocket's physics based on difficulty.
+     *
+     * @param gravityStrength New gravity acceleration in pixels/sec^2
+     * @param startingFuel    New maximum/starting fuel amount
+     *
+     * This does not move the rocket; it just changes how fast it falls
+     * and how much fuel it starts with on reset.
+     */
+    void SetDifficultyParams(float gravityStrength, float startingFuel);
+
 
 private:
     /// Constant thrust power applied when the up key is pressed
