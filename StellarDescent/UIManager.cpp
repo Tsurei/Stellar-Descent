@@ -39,7 +39,7 @@ void UIManager::DrawHUD(float fuel, float altitude, float timer) {
     DrawText(TextFormat("Time: %.1f", timer), 20, 80, 20, RAYWHITE);
 }
 
-void UIManager::DrawMenu() {
+void UIManager::DrawMenu(const std::string& difficultyLabel) {
     // Draw the game title centered near the top
     //DrawText("STELLAR DESCENT", 440, 200, 40, RAYWHITE);
     DrawTextEx(
@@ -70,8 +70,8 @@ void UIManager::DrawMenu() {
         unicode,
         u8"Press ↑ to add thrust!",
         { 450, 390 },   // position
-        60,           // font size
-        2,            // spacing between characters
+        60,             // font size
+        2,              // spacing between characters
         DARKBLUE
     );
 
@@ -79,12 +79,22 @@ void UIManager::DrawMenu() {
         unicode,
         u8"Press ← or → to rotate the ship",
         { 385, 420 },   // position
-        60,           // font size
-        2,            // spacing between characters
+        60,             // font size
+        2,              // spacing between characters
         DARKBLUE
     );
-    //DrawTextEx("Press [Left Arrow] or the [Right Arrow] to rotate the ship", 330, 410, 20, LIME);
+
+    // -------------------- DIFFICULTY INFO --------------------
+    // Show current difficulty and how to change it along the bottom.
+    DrawText(
+        TextFormat("Difficulty: %s  [1]=Easy  [2]=Normal  [3]=Hard", difficultyLabel.c_str()),
+        20,
+        680,
+        20,
+        RAYWHITE
+    );
 }
+
 
 void UIManager::DrawWin(float score) {
     // Draw congratulatory message for successful landing

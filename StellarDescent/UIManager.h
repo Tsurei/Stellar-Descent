@@ -32,10 +32,13 @@ public:
     /**
      * @brief Draw the main menu screen.
      *
+     * @param difficultyLabel Text describing the current difficulty preset (e.g., "Easy").
+     *
      * Typically called when GameState is MENU. Displays the game title and instructions
      * for starting or exiting the game.
      */
-    void DrawMenu();
+    void DrawMenu(const std::string& difficultyLabel);
+
 
     /**
      * @brief Draw the win screen after a successful landing.

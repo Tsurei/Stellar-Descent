@@ -7,6 +7,20 @@
 #include "GameStateManager.h"
 #include "Planet.h"
 
+/**
+ * @brief Represents a difficulty preset for Stellar Descent.
+ *
+ * Each preset controls gravity strength, starting fuel, and landing pad size.
+ * These values are applied to both the rocket and planet/world.
+ */
+struct DifficultyPreset {
+    const char* name;     // Display name ("Easy", "Normal", "Hard")
+    float gravity;        // Downward acceleration applied to the rocket
+    float startingFuel;   // Initial fuel given to the player
+    float padWidth;       // Width of the landing pad in world units
+};
+
+
 int main() {
     const int SCREEN_WIDTH = 1280;
     const int SCREEN_HEIGHT = 720;
@@ -16,8 +30,31 @@ int main() {
     SetExitKey(0); // Disable default ESC exit
     SetTargetFPS(60);
 
+    // -------------------- DIFFICULTY PRESETS --------------------
+    DifficultyPreset difficulties[] = {
+        { "Easy",   60.0f, 150.0f, 140.0f },
+        { "Normal", 80.0f, 100.0f, 100.0f },
+        { "Hard",   100.0f, 70.0f, 70.0f }
+    };
+    int currentDifficultyIndex = 1; // Start at Normal
+
     Rocket rocket({ 0, -200 });
-    Planet planet = { 80.0f, Rectangle{ -50, 310, 100, 10 } };
+
+    // Initialize planet using the active difficulty preset
+    DifficultyPreset& initialDiff = difficulties[currentDifficultyIndex];
+    Planet planet = {
+        initialDiff.gravity,
+        Rectangle{
+            -initialDiff.padWidth / 2.0f,  // keep pad centered at x = 0
+            310,
+            initialDiff.padWidth,
+            10
+        }
+    };
+
+    // Apply initial difficulty to rocket physics and fuel
+    rocket.SetDifficultyParams(initialDiff.gravity, initialDiff.startingFuel);
+
     UIManager ui;
     AudioSystem audio;
     CameraController cam;
