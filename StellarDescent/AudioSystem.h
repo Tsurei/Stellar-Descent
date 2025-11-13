@@ -9,20 +9,6 @@
  */
 class AudioSystem {
 public:
-    /// Background music stream
-    Music bgMusic;
-
-    /// Sound effect for rocket thrust
-    Music sfxThrust;
-
-    /// Sound effect for crashing
-    Sound sfxCrash;
-
-    /// Sound effect for successful landing
-    Sound sfxLand;
-
-    /// Flag to track whether the thrust sound is currently playing
-    bool thrustPlaying = false;
 
     /**
      * @brief Initialize the audio system.
@@ -67,4 +53,49 @@ public:
      * Should be called once when the game exits.
      */
     void Close();
+
+    /**
+    * @brief Sets the master audio volume.
+    *
+    * @param volume Value between 0.0f (silent) and 1.0f (full volume).
+    *
+    * This adjusts the global game volume. It clamps incoming
+    * values to a safe range and updates Raylib's internal volume.
+    * If mute is currently enabled, the new volume is stored but NOT applied
+    * until the player un-mutes.
+    */
+    void SetVolume(float volume);
+
+    /**
+     * @brief Toggles the global mute state.
+     *
+     * When muted, the game volume is set to 0.0f but the original
+     * volume level is preserved internally so unmuting restores it.
+     */
+    void ToggleMute();
+
+    // Helpers for UI
+    float GetVolume() const { return masterVolume; }
+    bool IsMuted() const { return isMuted; }
+
+private:
+    /// Background music stream
+    Music bgMusic;
+
+    /// Sound effect for rocket thrust
+    Music sfxThrust;
+
+    /// Sound effect for crashing
+    Sound sfxCrash;
+
+    /// Sound effect for successful landing
+    Sound sfxLand;
+
+    /// Flag to track whether the thrust sound is currently playing
+    bool thrustPlaying = false;
+
+    // Master volume and mute state for all audio output.
+    // Values are normalized between 0.0 (silent) and 1.0 (full volume).
+    float masterVolume = 1.0f; 
+    bool isMuted = false;
 };

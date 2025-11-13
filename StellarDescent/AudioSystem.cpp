@@ -61,3 +61,27 @@ void AudioSystem::Close() {
     UnloadSound(sfxLand);       // Free landing SFX
     CloseAudioDevice();          // Close audio hardware
 }
+
+void AudioSystem::SetVolume(float volume) {
+    // Clamp to [0, 1]
+    if (volume < 0.0f) volume = 0.0f;
+    if (volume > 1.0f) volume = 1.0f;
+
+    masterVolume = volume;
+
+    // Only apply if not muted
+    if (!isMuted) {
+        SetMasterVolume(masterVolume);
+    }
+}
+
+void AudioSystem::ToggleMute() {
+    isMuted = !isMuted;
+
+    if (isMuted) {
+        SetMasterVolume(0.0f);
+    }
+    else {
+        SetMasterVolume(masterVolume);
+    }
+}

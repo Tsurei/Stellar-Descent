@@ -40,6 +40,20 @@ int main() {
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
         audio.Update();
+        // ----------------- AUDIO CONTROLS -----------------
+        if (IsKeyPressed(KEY_M)) {
+            audio.ToggleMute();
+        }
+
+        // Increase volume
+        if (IsKeyPressed(KEY_EQUAL) || IsKeyPressed(KEY_KP_ADD)) {
+            audio.SetVolume(audio.GetVolume() + 0.1f);
+        }
+
+        // Decrease volume
+        if (IsKeyPressed(KEY_MINUS) || IsKeyPressed(KEY_KP_SUBTRACT)) {
+            audio.SetVolume(audio.GetVolume() - 0.1f);
+        }
 
         // ----------------- STATE LOGIC -----------------
         switch (state) {
@@ -176,6 +190,14 @@ int main() {
             break;
         }
 
+        // --- Volume HUD (bottom-left) ---
+        int volPercent = (int)(audio.GetVolume() * 100.0f);
+        DrawText(
+            TextFormat("Volume: %s%d%%  [M] Mute  [-/+]",
+                audio.IsMuted() ? "X " : "",
+                volPercent),
+            20, SCREEN_HEIGHT - 40, 20, RAYWHITE
+        );
         EndDrawing();
     }
 
