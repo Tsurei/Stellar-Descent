@@ -83,13 +83,36 @@ void Rocket::Reset(Vector2 startPos) {
 }
 
 void Rocket::UpdateParticles(float dt) {
-    // Spawn new particle if thrusting
-    if (IsKeyDown(KEY_UP) && fuel > 0) {
+    // Spawn new particles ONLY when thrusting
+    if (IsKeyDown(KEY_UP) && fuel > 0)
+    {
         Particle p;
-        p.position = { position.x, position.y + 15 }; // under rocket
-        p.velocity = { ((float)rand() / RAND_MAX - 0.5f) * 50, 50 + (float)rand() / RAND_MAX * 50 };
-        p.life = 0.5f + (float)rand() / RAND_MAX * 0.5f;
-        p.color = ORANGE;
+
+        // -------------------- PARTICLE SPAWN POSITION --------------------
+        // Thruster is 15px "below" the rocket in *local* space
+        Vector2 localOffset = { 0.0f, 15.0f };
+
+        float rad = rotation * DEG2RAD;
+        float c = cosf(rad);
+        float s = sinf(rad);
+
+        // Rotate local offset by rocket orientation
+        p.position.x = position.x + (localOffset.x * c - localOffset.y * s);
+        p.position.y = position.y + (localOffset.x * s + localOffset.y * c);
+
+        // -------------------- PARTICLE VELOCITY --------------------
+        // Raw randomized exhaust direction (local rocket space)
+        float vx = ((float)rand() / RAND_MAX - 0.5f) * 30;   // small sideways jitter
+        float vy = 80 + (float)rand() / RAND_MAX * 40;        // strong backward thrust
+
+        // Rotate velocity into world space (same rotation as rocket)
+        p.velocity.x = vx * c - vy * s;
+        p.velocity.y = vx * s + vy * c;
+
+        // -------------------- PARTICLE SETTINGS --------------------
+        p.life = 0.4f + (float)rand() / RAND_MAX * 0.3f;
+        p.color = YELLOW;
+
         particles.push_back(p);
     }
 

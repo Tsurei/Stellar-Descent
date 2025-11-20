@@ -54,7 +54,7 @@ int main() {
         audio.Update();
 
         // ----------------- AUDIO CONTROLS -----------------
-        if (IsKeyPressed(KEY_M)) {
+        if (IsKeyPressed(KEY_ZERO)) {
             audio.ToggleMute();
         }
         if (IsKeyPressed(KEY_EQUAL) || IsKeyPressed(KEY_KP_ADD)) {
@@ -285,7 +285,7 @@ int main() {
         // --- Volume HUD (bottom-left) ---
         int volPercent = (int)(audio.GetVolume() * 100.0f);
         DrawText(
-            TextFormat("Volume: %s%d%%  [M] Mute  [-/+]",
+            TextFormat("Volume: %s%d%%  [0] Mute  [-/+]",
                 audio.IsMuted() ? "X " : "",
                 volPercent),
             20, SCREEN_HEIGHT - 40, 20, RAYWHITE
