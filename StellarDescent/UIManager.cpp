@@ -100,12 +100,14 @@ void UIManager::DrawWin(float score) {
     DrawText(TextFormat("Score: %.0f", score), 500, 350, 30, YELLOW);
     DrawText("Press [ENTER] to Continue", 460, 410, 20, WHITE);
     DrawText("Press [R] to Restart Level", 460, 440, 20, WHITE);
+    DrawText("Press [M] to return to Main Menu", 440, 330, 20, WHITE);
 }
 
 void UIManager::DrawCrash() {
     DrawText("You Crashed!", 530, 300, 40, RED);
     DrawText("Press [R] to Restart Level", 480, 360, 20, WHITE);
     DrawText("Press [ENTER] to Retry", 480, 390, 20, WHITE);
+    DrawText("Press [M] to return to Main Menu", 440, 330, 20, WHITE);
 }
 
 void UIManager::DrawPause() {

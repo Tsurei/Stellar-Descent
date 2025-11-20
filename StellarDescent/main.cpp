@@ -206,6 +206,9 @@ int main() {
                 levelManager.RestartCurrentLevel(rocket, planet, obstacles, timer, startGame);
                 state = GameState::PLAYING;
             }
+            if (IsKeyPressed(KEY_M)) {
+                state = GameState::MENU;
+            }
             if (IsKeyPressed(KEY_Q)) break;
             break;
 
@@ -214,6 +217,9 @@ int main() {
             if (IsKeyPressed(KEY_R)) {
                 levelManager.RestartCurrentLevel(rocket, planet, obstacles, timer, startGame);
                 state = GameState::PLAYING;
+            }
+            if (IsKeyPressed(KEY_M)) {
+                state = GameState::MENU;
             }
             if (IsKeyPressed(KEY_Q)) break;
             break;
