@@ -187,6 +187,9 @@ int main() {
                 levelManager.RestartCurrentLevel(rocket, planet, obstacles, timer, startGame);
                 state = GameState::PLAYING;
             }
+            if (IsKeyPressed(KEY_M)) {
+                state = GameState::MENU;
+            }
 
             if (IsKeyPressed(KEY_Q)) CloseWindow();
             break;
@@ -256,7 +259,8 @@ int main() {
         case GameState::MENU:
             // Right now DrawMenu only knows about difficulty;
             // you could extend it later to also show levelManager.GetLevelName().
-            ui.DrawMenu(levelManager.GetDifficultyName());
+            ui.DrawMenu(levelManager.GetDifficultyName(),
+                levelManager.GetLevelName());
             break;
         case GameState::PLAYING:
             ui.DrawHUD(rocket.fuel, 300 - rocket.position.y, timer);

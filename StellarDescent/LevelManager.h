@@ -67,7 +67,7 @@ private:
     };
 
     static constexpr int DIFFICULTY_COUNT = 3;
-    static constexpr int LEVEL_COUNT = 3;
+    static constexpr int LEVEL_COUNT = 6;   // <-- now 6 levels
 
     DifficultyPreset difficulties[DIFFICULTY_COUNT];
     LevelPreset      levels[LEVEL_COUNT];

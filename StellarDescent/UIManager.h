@@ -37,7 +37,8 @@ public:
      * Typically called when GameState is MENU. Displays the game title and instructions
      * for starting or exiting the game.
      */
-    void DrawMenu(const std::string& difficultyLabel);
+    void DrawMenu(const std::string& difficultyLabel,
+                    const std::string& levelLabel);
 
 
     /**

@@ -16,9 +16,50 @@ void LevelManager::Init(Rocket& rocket, Planet& planet, std::vector<MovingObstac
     difficulties[2] = { "Hard",  100.0f,  70.0f,  70.0f, 6 };
 
     // -------------------- LEVEL PRESETS --------------------
-    levels[0] = { "Central Valley", { 0.0f,   -200.0f },   0.0f };
-    levels[1] = { "Left Approach",  { -180.0f,-220.0f }, -180.0f };
-    levels[2] = { "Right Ridge",    { 180.0f,-220.0f },  180.0f };
+    // You can tweak these numbers however you like.
+    // y is mostly the spawn height; pad is always at y = 310 in ApplyCurrentPreset.
+
+    // 0: Straightforward central drop
+    levels[0] = {
+        "Central Valley",
+        {   0.0f,  -200.0f },   // start pos
+        0.0f                     // pad center X
+    };
+
+    // 1: Approach from the far left
+    levels[1] = {
+        "Left Approach",
+        { -260.0f, -220.0f },
+        -180.0f
+    };
+
+    // 2: Approach from the far right
+    levels[2] = {
+        "Right Ridge",
+        {  260.0f, -220.0f },
+        180.0f
+    };
+
+    // 3: High drop over central pad (more time to drift)
+    levels[3] = {
+        "High Descent",
+        {   0.0f,  -320.0f },
+        0.0f
+    };
+
+    // 4: Off-screen left start, pad near center
+    levels[4] = {
+        "Blind Left",
+        { -380.0f, -240.0f },  // start way off-screen on the left
+        -60.0f                 // pad slightly left
+    };
+
+    // 5: Off-screen right start, pad near center
+    levels[5] = {
+        "Blind Right",
+        {  380.0f, -240.0f },
+        60.0f
+    };
 
     // Apply starting difficulty & level to world
     ApplyCurrentPreset(rocket, planet, obstacles);
@@ -34,7 +75,7 @@ void LevelManager::SetupObstacles(const DifficultyPreset& diff,
     float centerX = level.padCenterX;
     float minX = centerX - 220.0f;
     float maxX = centerX + 220.0f;
-    float minY = -200.0f;
+    float minY = -220.0f;
     float maxY = 260.0f; // above ground (y=310)
 
     for (int i = 0; i < diff.obstacleCount; ++i) {
