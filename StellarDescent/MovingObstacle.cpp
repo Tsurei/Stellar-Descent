@@ -140,7 +140,7 @@ void MovingObstacle::Draw() const
     BuildBoxVertices(center, half, rotation, v);
 
 
-    // -------------------- DEBUG OUTLINE --------------------
+    // -------------------- DEBUG OUTLINE (Currently only visible way) --------------------
     for (int i = 0; i < 4; ++i) {
         DrawLineV(v[i], v[(i + 1) % 4], RED);
     }
